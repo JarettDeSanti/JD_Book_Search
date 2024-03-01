@@ -11,32 +11,35 @@ const resolvers = {
 
       throw AuthenticationError;
     },
-    
+    users: async (parent, args, context) => {
+      const users = await User.find()
+      return users
+    }
   },
   Mutation: {
     login: async (parent, args) => {
-      const user = await User.findOne({email: args.email});
-    if (!user) {
-      throw AuthenticationError;
-    }
+      const user = await User.findOne({ email: args.email });
+      if (!user) {
+        throw AuthenticationError;
+      }
 
-    const correctPw = await user.isCorrectPassword(args.password);
+      const correctPw = await user.isCorrectPassword(args.password);
 
-    if (!correctPw) {
-      throw AuthenticationError;
-    }
-    const token = signToken(user);
-    return {user, token};
+      if (!correctPw) {
+        throw AuthenticationError;
+      }
+      const token = signToken(user);
+      return { user, token };
     },
 
-    signup: async (parent, { username, email, password }) => {
-      const user = await User.create({username, email, password});
-
+    addUser: async (parent, args) => {
+      const user = await User.create({username: args.username, email: args.email, password: args.password});
+      console.log(user);
       if (!user) {
         throw AuthenticationError;
       }
       const token = signToken(user);
-      return {user, token};
+      return { user, token };
     },
     // saveBook: async (parent, args, context) => {},
     // deleteBook: async (parent, args, context) => {}
